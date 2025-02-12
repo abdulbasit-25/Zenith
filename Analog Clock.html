@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stylish Analog Clock</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(120deg, #1e3c72, #2a5298);
+            /* Cooler gradient */
+            margin: 0;
+            padding: 0;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            width: auto;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.877);
+            /* Enhanced shadow */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .clock {
+            width: 250px;
+            height: 250px;
+            border: 10px solid #fff;
+            border-radius: 50%;
+            position: relative;
+            background: rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .hand {
+            position: absolute;
+            background: white;
+            transform-origin: bottom;
+            transition: transform 0.1s ease-out;
+            border-radius: 5px;
+        }
+
+        .hour {
+            width: 8px;
+            height: 70px;
+            top: 50px;
+            background: #ffcc00;
+        }
+
+        .minute {
+            width: 6px;
+            height: 90px;
+            top: 30px;
+            background: #00e1ff;
+        }
+
+        .second {
+            width: 2px;
+            height: 100px;
+            top: 20px;
+            background: red;
+        }
+
+        .center-dot {
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .date {
+    font-size: 1.2em;
+    margin-top: 15px;
+    font-family: 'Times New Roman', Times, serif;
+    font-weight: 500;
+    color: #fff;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4), 0px 0px 10px #00e1ff; 
+        }
+
+
+        /* Responsive design */
+        @media screen and (max-width: 400px) {
+            .container {
+                width: 280px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .clock {
+                width: 200px;
+                height: 200px;
+            }
+
+            .hour,
+            .minute,
+            .second {
+                top: 40px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Stylish Analog Clock</h1>
+        <div class="clock">
+            <div class="hand hour" id="hour"></div>
+            <div class="hand minute" id="minute"></div>
+            <div class="hand second" id="second"></div>
+            <div class="center-dot"></div>
+        </div>
+        <div class="date" id="date"></div>
+    </div>
+    
+    <audio id="tick-sound" src="https://www.soundjay.com/clock/sounds/clock-ticking-2.mp3"></audio>
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const hours = now.getHours() % 12;
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
+
+            const hourDeg = (hours * 30) + (minutes * 0.5);
+            const minuteDeg = (minutes * 6) + (seconds * 0.1);
+            const secondDeg = seconds * 6;
+
+            document.getElementById('hour').style.transform = `rotate(${hourDeg}deg)`;
+            document.getElementById('minute').style.transform = `rotate(${minuteDeg}deg)`;
+            document.getElementById('second').style.transform = `rotate(${secondDeg}deg)`;
+
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('date').innerText = now.toLocaleDateString('en-US', dateOptions);
+
+            // Play tick sound
+            let tickSound = document.getElementById('tick-sound');
+            tickSound.currentTime = 0; // Reset time to avoid delay
+            tickSound.play().catch(error => console.log("Audio play prevented:", error));
+        }
+
+        // Start clock on page load
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Enable ticking sound on user interaction (fix autoplay issues)
+        document.body.addEventListener('click', () => {
+            document.getElementById('tick-sound').play();
+        }, { once: true });
+    </script>
+
+
+
+
+</body>
+
+</html>
