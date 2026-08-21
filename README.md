@@ -1,6 +1,3 @@
-Great choice — **Zenith** is sharp, premium, and memorable. Here's the full README updated with the new name:
-
-```markdown
 <div align="center">
 
 # ⏱ Zenith
