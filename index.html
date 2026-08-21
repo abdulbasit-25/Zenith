@@ -1,1 +1,1857 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R.A.Y.N Clock — Premium Analog & Digital Timepiece</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #111827;
+            --bg-card: rgba(255, 255, 255, 0.04);
+            --bg-card-hover: rgba(255, 255, 255, 0.08);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(56, 189, 248, 0.3);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.6);
+            --text-muted: rgba(255, 255, 255, 0.35);
+            --accent: #38bdf8;
+            --accent-dim: rgba(56, 189, 248, 0.15);
+            --gold: #fbbf24;
+            --gold-dim: rgba(251, 191, 36, 0.15);
+            --red: #f87171;
+            --red-dim: rgba(248, 113, 113, 0.15);
+            --green: #34d399;
+            --green-dim: rgba(52, 211, 153, 0.15);
+            --purple: #a78bfa;
+            --purple-dim: rgba(167, 139, 250, 0.15);
+            --clock-size: 340px;
+            --shadow-glow: 0 0 60px rgba(56, 189, 248, 0.08);
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* ─── Ambient Background ─── */
+        .ambient-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .ambient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.3;
+            animation: orbFloat 20s ease-in-out infinite;
+        }
+
+        .ambient-orb:nth-child(1) {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.3), transparent 70%);
+            top: -10%;
+            right: -5%;
+            animation-duration: 25s;
+        }
+
+        .ambient-orb:nth-child(2) {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(167, 139, 250, 0.25), transparent 70%);
+            bottom: -10%;
+            left: -5%;
+            animation-duration: 30s;
+            animation-delay: -5s;
+        }
+
+        .ambient-orb:nth-child(3) {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(251, 191, 36, 0.15), transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-duration: 22s;
+            animation-delay: -10s;
+        }
+
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(30px, -20px) scale(1.05); }
+            50% { transform: translate(-20px, 30px) scale(0.95); }
+            75% { transform: translate(20px, 20px) scale(1.02); }
+        }
+
+        /* ─── Particles ─── */
+        .particles-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ─── Layout ─── */
+        .app-wrapper {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ─── Top Bar ─── */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 32px;
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            background: rgba(10, 14, 26, 0.6);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+        }
+
+        .top-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .icon-btn {
+            width: 38px;
+            height: 38px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1rem;
+        }
+
+        .icon-btn:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            border-color: var(--border-glow);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.1);
+        }
+
+        .icon-btn.active {
+            background: var(--accent-dim);
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        /* ─── Main Content ─── */
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 24px 60px;
+            gap: 32px;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* ─── Clock Section ─── */
+        .clock-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 28px;
+        }
+
+        .clock-container {
+            position: relative;
+            width: var(--clock-size);
+            height: var(--clock-size);
+        }
+
+        .clock-ring-outer {
+            position: absolute;
+            inset: -12px;
+            border-radius: 50%;
+            border: 1px solid rgba(56, 189, 248, 0.1);
+            animation: ringPulse 4s ease-in-out infinite;
+        }
+
+        .clock-ring-inner {
+            position: absolute;
+            inset: -6px;
+            border-radius: 50%;
+            border: 1px solid rgba(56, 189, 248, 0.06);
+        }
+
+        @keyframes ringPulse {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.01); }
+        }
+
+        .clock-face {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, rgba(30, 41, 59, 0.9), rgba(10, 14, 26, 0.95));
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            box-shadow:
+                var(--shadow-glow),
+                inset 0 0 60px rgba(0, 0, 0, 0.5),
+                0 20px 60px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        .clock-face::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.03), transparent 60%);
+            pointer-events: none;
+        }
+
+        /* ─── Hour Markers ─── */
+        .hour-marker {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform-origin: 0 0;
+        }
+
+        .hour-marker .tick {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 2px;
+        }
+
+        .hour-marker.major .tick {
+            width: 3px;
+            height: 18px;
+            background: var(--text-primary);
+            box-shadow: 0 0 6px rgba(255, 255, 255, 0.2);
+        }
+
+        .hour-marker.minor .tick {
+            width: 1.5px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .hour-number {
+            position: absolute;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 18px;
+            color: var(--text-primary);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            transform: translate(-50%, -50%);
+        }
+
+        .hour-number.twelve {
+            color: var(--accent);
+            text-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+        }
+
+        /* ─── Clock Hands ─── */
+        .hand {
+            position: absolute;
+            left: 50%;
+            bottom: 50%;
+            transform-origin: bottom center;
+            border-radius: 4px;
+            z-index: 10;
+            transition: none;
+        }
+
+        .hand-hour {
+            width: 5px;
+            height: 80px;
+            margin-left: -2.5px;
+            background: linear-gradient(to top, var(--gold), #fcd34d);
+            box-shadow: 0 0 12px rgba(251, 191, 36, 0.4);
+            border-radius: 3px;
+            z-index: 11;
+        }
+
+        .hand-hour::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 5px;
+            height: 20px;
+            background: linear-gradient(to bottom, var(--gold), rgba(251, 191, 36, 0.3));
+            border-radius: 3px;
+        }
+
+        .hand-minute {
+            width: 3.5px;
+            height: 105px;
+            margin-left: -1.75px;
+            background: linear-gradient(to top, var(--accent), #7dd3fc);
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+            border-radius: 2px;
+            z-index: 12;
+        }
+
+        .hand-minute::after {
+            content: '';
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 3.5px;
+            height: 25px;
+            background: linear-gradient(to bottom, var(--accent), rgba(56, 189, 248, 0.2));
+            border-radius: 2px;
+        }
+
+        .hand-second {
+            width: 1.5px;
+            height: 120px;
+            margin-left: -0.75px;
+            background: linear-gradient(to top, var(--red), #fca5a5);
+            box-shadow: 0 0 8px rgba(248, 113, 113, 0.5);
+            z-index: 13;
+        }
+
+        .hand-second::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1.5px;
+            height: 30px;
+            background: linear-gradient(to bottom, var(--red), rgba(248, 113, 113, 0.1));
+        }
+
+        .hand-second.smooth {
+            transition: transform 0.05s linear;
+        }
+
+        .hand-second.tick {
+            transition: transform 0.2s cubic-bezier(0.4, 2.08, 0.55, 0.44);
+        }
+
+        .center-cap {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 14px;
+            height: 14px;
+            background: radial-gradient(circle, #fff, var(--accent));
+            border-radius: 50%;
+            z-index: 20;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+        }
+
+        .center-cap-inner {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 6px;
+            height: 6px;
+            background: var(--bg-primary);
+            border-radius: 50%;
+            z-index: 21;
+        }
+
+        /* ─── Digital Display ─── */
+        .digital-display {
+            text-align: center;
+        }
+
+        .digital-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.8rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+
+        .digital-time .seconds {
+            font-size: 1.4rem;
+            opacity: 0.6;
+            -webkit-text-fill-color: var(--text-secondary);
+        }
+
+        .digital-time .ampm {
+            font-size: 0.9rem;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            margin-left: 6px;
+            -webkit-text-fill-color: var(--accent);
+            opacity: 0.8;
+        }
+
+        .digital-date {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            font-weight: 400;
+        }
+
+        .digital-timezone {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+
+        /* ─── Side Panel ─── */
+        .side-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 340px;
+            max-height: calc(100vh - 140px);
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .side-panel::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .side-panel::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .side-panel::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        /* ─── Cards ─── */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            backdrop-filter: blur(20px);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 8px var(--accent);
+        }
+
+        .card-badge {
+            font-size: 0.65rem;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .badge-live {
+            background: var(--green-dim);
+            color: var(--green);
+        }
+
+        .badge-standby {
+            background: var(--gold-dim);
+            color: var(--gold);
+        }
+
+        .badge-stopped {
+            background: var(--red-dim);
+            color: var(--red);
+        }
+
+        /* ─── Stopwatch ─── */
+        .stopwatch-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 600;
+            text-align: center;
+            padding: 8px 0;
+            color: var(--text-primary);
+            letter-spacing: 0.03em;
+        }
+
+        .stopwatch-display .ms {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+
+        .stopwatch-controls {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-primary {
+            background: var(--accent-dim);
+            border-color: rgba(56, 189, 248, 0.3);
+            color: var(--accent);
+        }
+
+        .btn-primary:hover {
+            background: rgba(56, 189, 248, 0.25);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
+        }
+
+        .btn-danger {
+            background: var(--red-dim);
+            border-color: rgba(248, 113, 113, 0.3);
+            color: var(--red);
+        }
+
+        .btn-danger:hover {
+            background: rgba(248, 113, 113, 0.25);
+        }
+
+        .btn-gold {
+            background: var(--gold-dim);
+            border-color: rgba(251, 191, 36, 0.3);
+            color: var(--gold);
+        }
+
+        .btn-gold:hover {
+            background: rgba(251, 191, 36, 0.25);
+        }
+
+        .stopwatch-laps {
+            margin-top: 12px;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        .stopwatch-laps::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .stopwatch-laps::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 3px;
+        }
+
+        .lap-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 0.8rem;
+            animation: lapIn 0.3s ease-out;
+        }
+
+        @keyframes lapIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .lap-item:last-child {
+            border-bottom: none;
+        }
+
+        .lap-num {
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+        }
+
+        .lap-time {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-secondary);
+        }
+
+        .lap-diff {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--green);
+        }
+
+        /* ─── Timer ─── */
+        .timer-presets {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .preset-btn {
+            padding: 5px 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .preset-btn:hover, .preset-btn.active {
+            background: var(--purple-dim);
+            border-color: var(--purple);
+            color: var(--purple);
+        }
+
+        .timer-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .timer-input {
+            width: 60px;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            text-align: center;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .timer-input:focus {
+            border-color: var(--purple);
+            box-shadow: 0 0 15px rgba(167, 139, 250, 0.15);
+        }
+
+        .timer-input-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .timer-input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .timer-sep {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            margin-top: 14px;
+        }
+
+        .timer-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 600;
+            text-align: center;
+            padding: 8px 0;
+            color: var(--text-primary);
+        }
+
+        .timer-display.warning {
+            color: var(--gold);
+            animation: timerPulse 1s ease-in-out infinite;
+        }
+
+        .timer-display.danger {
+            color: var(--red);
+            animation: timerPulse 0.5s ease-in-out infinite;
+        }
+
+        @keyframes timerPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .timer-progress {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+
+        .timer-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--purple), var(--accent));
+            border-radius: 4px;
+            transition: width 1s linear;
+            box-shadow: 0 0 10px rgba(167, 139, 250, 0.4);
+        }
+
+        /* ─── World Clocks ─── */
+        .world-clock-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .world-clock-item:last-child {
+            border-bottom: none;
+        }
+
+        .wc-city {
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .wc-zone {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .wc-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .wc-diff {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            text-align: right;
+            margin-top: 2px;
+        }
+
+        /* ─── Settings ─── */
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .setting-row:last-child {
+            border-bottom: none;
+        }
+
+        .setting-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .setting-label small {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* Toggle Switch */
+        .toggle {
+            width: 42px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            outline: none;
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: var(--text-secondary);
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            transition: var(--transition);
+        }
+
+        .toggle.on {
+            background: var(--accent-dim);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+
+        .toggle.on::after {
+            left: 21px;
+            background: var(--accent);
+            box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+        }
+
+        /* Select */
+        .custom-select {
+            padding: 6px 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--text-primary);
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.75rem;
+            outline: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .custom-select:focus {
+            border-color: var(--accent);
+        }
+
+        .custom-select option {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        /* ─── Toast ─── */
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            right: 24px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast {
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            animation: toastIn 0.4s ease-out, toastOut 0.4s ease-in 2.6s forwards;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .toast-success {
+            background: rgba(52, 211, 153, 0.15);
+            border-color: rgba(52, 211, 153, 0.3);
+            color: var(--green);
+        }
+
+        .toast-info {
+            background: rgba(56, 189, 248, 0.15);
+            border-color: rgba(56, 189, 248, 0.3);
+            color: var(--accent);
+        }
+
+        .toast-warning {
+            background: rgba(251, 191, 36, 0.15);
+            border-color: rgba(251, 191, 36, 0.3);
+            color: var(--gold);
+        }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes toastOut {
+            from { opacity: 1; transform: translateX(0); }
+            to { opacity: 0; transform: translateX(40px); }
+        }
+
+        /* ─── Fullscreen Mode ─── */
+        body.fullscreen-mode .top-bar,
+        body.fullscreen-mode .side-panel {
+            display: none;
+        }
+
+        body.fullscreen-mode .main-content {
+            padding: 0;
+            height: 100vh;
+        }
+
+        body.fullscreen-mode .clock-section {
+            justify-content: center;
+            height: 100%;
+        }
+
+        body.fullscreen-mode .clock-container {
+            --clock-size: min(80vw, 80vh, 600px);
+            width: var(--clock-size);
+            height: var(--clock-size);
+        }
+
+        body.fullscreen-mode .digital-time {
+            font-size: 3.5rem;
+        }
+
+        body.fullscreen-mode .hand-hour {
+            height: calc(var(--clock-size) * 0.235);
+        }
+
+        body.fullscreen-mode .hand-minute {
+            height: calc(var(--clock-size) * 0.31);
+        }
+
+        body.fullscreen-mode .hand-second {
+            height: calc(var(--clock-size) * 0.35);
+        }
+
+        body.fullscreen-mode .hand-hour::after {
+            bottom: calc(var(--clock-size) * -0.06);
+            height: calc(var(--clock-size) * 0.06);
+        }
+
+        body.fullscreen-mode .hand-minute::after {
+            bottom: calc(var(--clock-size) * -0.074);
+            height: calc(var(--clock-size) * 0.074);
+        }
+
+        body.fullscreen-mode .hand-second::after {
+            bottom: calc(var(--clock-size) * -0.088);
+            height: calc(var(--clock-size) * 0.088);
+        }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 860px) {
+            .main-content {
+                flex-direction: column;
+                align-items: center;
+                padding: 24px 16px 40px;
+                gap: 24px;
+            }
+
+            .side-panel {
+                width: 100%;
+                max-width: 400px;
+                max-height: none;
+                overflow: visible;
+                padding-right: 0;
+            }
+
+            .top-bar {
+                padding: 12px 16px;
+            }
+
+            :root {
+                --clock-size: 280px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            :root {
+                --clock-size: 240px;
+            }
+
+            .digital-time {
+                font-size: 2rem;
+            }
+
+            .stopwatch-display,
+            .timer-display {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Ambient Background -->
+    <div class="ambient-bg">
+        <div class="ambient-orb"></div>
+        <div class="ambient-orb"></div>
+        <div class="ambient-orb"></div>
+    </div>
+
+    <!-- Particles -->
+    <canvas class="particles-canvas" id="particlesCanvas"></canvas>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="app-wrapper">
+        <!-- Top Bar -->
+        <header class="top-bar">
+            <div class="logo">
+                <div class="logo-icon">⏱</div>
+                <span>R.A.Y.N Clock</span>
+            </div>
+            <div class="top-controls">
+                <button class="icon-btn" id="btnSound" title="Toggle Tick Sound">🔊</button>
+                <button class="icon-btn" id="btnSmooth" title="Toggle Smooth Seconds">⚡</button>
+                <button class="icon-btn" id="btnFullscreen" title="Fullscreen Clock">⛶</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Clock Section -->
+            <section class="clock-section">
+                <div class="clock-container">
+                    <div class="clock-ring-outer"></div>
+                    <div class="clock-ring-inner"></div>
+                    <div class="clock-face" id="clockFace">
+                        <!-- Markers & Numbers injected by JS -->
+                        <div class="hand hand-hour" id="handHour"></div>
+                        <div class="hand hand-minute" id="handMinute"></div>
+                        <div class="hand hand-second smooth" id="handSecond"></div>
+                        <div class="center-cap"></div>
+                        <div class="center-cap-inner"></div>
+                    </div>
+                </div>
+
+                <div class="digital-display">
+                    <div class="digital-time" id="digitalTime">00:00<span class="seconds">:00</span></div>
+                    <div class="digital-date" id="digitalDate">Loading...</div>
+                    <div class="digital-timezone" id="digitalTimezone">UTC</div>
+                </div>
+            </section>
+
+            <!-- Side Panel -->
+            <aside class="side-panel">
+                <!-- Stopwatch -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><span class="dot"></span> Stopwatch</div>
+                        <span class="card-badge badge-standby" id="swBadge">Standby</span>
+                    </div>
+                    <div class="stopwatch-display" id="swDisplay">00:00<span class="ms">.00</span></div>
+                    <div class="stopwatch-controls">
+                        <button class="btn btn-primary" id="swStart">▶ Start</button>
+                        <button class="btn btn-gold" id="swLap" disabled>🏁 Lap</button>
+                        <button class="btn btn-danger" id="swReset" disabled>↺ Reset</button>
+                    </div>
+                    <div class="stopwatch-laps" id="swLaps"></div>
+                </div>
+
+                <!-- Timer -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><span class="dot" style="background: var(--purple); box-shadow: 0 0 8px var(--purple);"></span> Timer</div>
+                        <span class="card-badge badge-stopped" id="tmBadge">Stopped</span>
+                    </div>
+                    <div class="timer-presets">
+                        <button class="preset-btn" data-m="1">1m</button>
+                        <button class="preset-btn" data-m="3">3m</button>
+                        <button class="preset-btn" data-m="5">5m</button>
+                        <button class="preset-btn" data-m="10">10m</button>
+                        <button class="preset-btn" data-m="15">15m</button>
+                        <button class="preset-btn" data-m="30">30m</button>
+                    </div>
+                    <div class="timer-input-row">
+                        <div class="timer-input-group">
+                            <input type="number" class="timer-input" id="tmH" min="0" max="23" value="0">
+                            <span class="timer-input-label">hrs</span>
+                        </div>
+                        <span class="timer-sep">:</span>
+                        <div class="timer-input-group">
+                            <input type="number" class="timer-input" id="tmM" min="0" max="59" value="5">
+                            <span class="timer-input-label">min</span>
+                        </div>
+                        <span class="timer-sep">:</span>
+                        <div class="timer-input-group">
+                            <input type="number" class="timer-input" id="tmS" min="0" max="59" value="0">
+                            <span class="timer-input-label">sec</span>
+                        </div>
+                    </div>
+                    <div class="timer-display" id="tmDisplay">00:05:00</div>
+                    <div class="timer-progress">
+                        <div class="timer-progress-bar" id="tmProgress" style="width: 100%;"></div>
+                    </div>
+                    <div class="stopwatch-controls" style="margin-top: 12px;">
+                        <button class="btn btn-primary" id="tmStart">▶ Start</button>
+                        <button class="btn btn-danger" id="tmReset" disabled>↺ Reset</button>
+                    </div>
+                </div>
+
+                <!-- World Clocks -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><span class="dot" style="background: var(--green); box-shadow: 0 0 8px var(--green);"></span> World Clocks</div>
+                        <span class="card-badge badge-live">Live</span>
+                    </div>
+                    <div id="worldClocks"></div>
+                </div>
+
+                <!-- Settings -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><span class="dot" style="background: var(--gold); box-shadow: 0 0 8px var(--gold);"></span> Settings</div>
+                    </div>
+                    <div class="setting-row">
+                        <div class="setting-label">
+                            24-Hour Format
+                            <small>Use 24h instead of 12h AM/PM</small>
+                        </div>
+                        <button class="toggle on" id="tog24h" aria-label="Toggle 24h format"></button>
+                    </div>
+                    <div class="setting-row">
+                        <div class="setting-label">
+                            Show Date
+                            <small>Display date below digital time</small>
+                        </div>
+                        <button class="toggle on" id="togDate" aria-label="Toggle date display"></button>
+                    </div>
+                    <div class="setting-row">
+                        <div class="setting-label">
+                            Show Numbers
+                            <small>Hour numbers on clock face</small>
+                        </div>
+                        <button class="toggle on" id="togNumbers" aria-label="Toggle hour numbers"></button>
+                    </div>
+                    <div class="setting-row">
+                        <div class="setting-label">
+                            Timezone
+                            <small>Override system timezone</small>
+                        </div>
+                        <select class="custom-select" id="selTimezone">
+                            <option value="local">Local</option>
+                            <option value="UTC">UTC</option>
+                            <option value="America/New_York">New York (EST)</option>
+                            <option value="America/Los_Angeles">Los Angeles (PST)</option>
+                            <option value="Europe/London">London (GMT)</option>
+                            <option value="Europe/Paris">Paris (CET)</option>
+                            <option value="Asia/Dubai">Dubai (GST)</option>
+                            <option value="Asia/Karachi">Karachi (PKT)</option>
+                            <option value="Asia/Kolkata">Mumbai (IST)</option>
+                            <option value="Asia/Shanghai">Shanghai (CST)</option>
+                            <option value="Asia/Tokyo">Tokyo (JST)</option>
+                            <option value="Australia/Sydney">Sydney (AEST)</option>
+                        </select>
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <audio id="tickSound" src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA="></audio>
+
+    <script>
+        /* ══════════════════════════════════════════
+           State
+        ══════════════════════════════════════════ */
+        const state = {
+            soundOn: false,
+            smoothSeconds: true,
+            use24h: true,
+            showDate: true,
+            showNumbers: true,
+            timezone: 'local',
+            fullscreen: false,
+            sw: { running: false, elapsed: 0, laps: [], lastTick: 0, interval: null },
+            tm: { running: false, total: 300, remaining: 300, interval: null }
+        };
+
+        /* ══════════════════════════════════════════
+           DOM Refs
+        ══════════════════════════════════════════ */
+        const $ = id => document.getElementById(id);
+        const clockFace = $('clockFace');
+        const handHour = $('handHour');
+        const handMinute = $('handMinute');
+        const handSecond = $('handSecond');
+        const digitalTime = $('digitalTime');
+        const digitalDate = $('digitalDate');
+        const digitalTimezone = $('digitalTimezone');
+        const swDisplay = $('swDisplay');
+        const swBadge = $('swBadge');
+        const swLaps = $('swLaps');
+        const tmDisplay = $('tmDisplay');
+        const tmBadge = $('tmBadge');
+        const tmProgress = $('tmProgress');
+        const toastContainer = $('toastContainer');
+
+        /* ══════════════════════════════════════════
+           Build Clock Face
+        ══════════════════════════════════════════ */
+        function buildClockFace() {
+            // Remove old markers/numbers
+            clockFace.querySelectorAll('.hour-marker, .hour-number').forEach(el => el.remove());
+
+            const size = clockFace.offsetWidth || 340;
+            const radius = size / 2;
+            const isSmall = size < 260;
+            const fontSize = isSmall ? 13 : 18;
+            const majorLen = isSmall ? 12 : 18;
+            const minorLen = isSmall ? 7 : 10;
+
+            // Tick marks
+            for (let i = 0; i < 60; i++) {
+                const angle = (i * 6 - 90) * Math.PI / 180;
+                const isMajor = i % 5 === 0;
+                const len = isMajor ? majorLen : minorLen;
+                const outerR = radius - 8;
+                const innerR = outerR - len;
+
+                const x1 = radius + outerR * Math.cos(angle);
+                const y1 = radius + outerR * Math.sin(angle);
+                const x2 = radius + innerR * Math.cos(angle);
+                const y2 = radius + innerR * Math.sin(angle);
+
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                svg.setAttribute('x1', x1);
+                svg.setAttribute('y1', y1);
+                svg.setAttribute('x2', x2);
+                svg.setAttribute('y2', y2);
+                svg.setAttribute('stroke', isMajor ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.2)');
+                svg.setAttribute('stroke-width', isMajor ? '2.5' : '1');
+                svg.setAttribute('stroke-linecap', 'round');
+                svg.style.position = 'absolute';
+                svg.style.top = '0';
+                svg.style.left = '0';
+                svg.style.pointerEvents = 'none';
+                clockFace.appendChild(svg);
+            }
+
+            // Numbers
+            if (state.showNumbers) {
+                for (let h = 1; h <= 12; h++) {
+                    const angle = (h * 30 - 90) * Math.PI / 180;
+                    const numR = radius - 34;
+                    const x = radius + numR * Math.cos(angle);
+                    const y = radius + numR * Math.sin(angle);
+
+                    const num = document.createElement('div');
+                    num.className = 'hour-number' + (h === 12 ? ' twelve' : '');
+                    num.textContent = h;
+                    num.style.left = x + 'px';
+                    num.style.top = y + 'px';
+                    num.style.fontSize = fontSize + 'px';
+                    clockFace.appendChild(num);
+                }
+            }
+        }
+
+        /* ══════════════════════════════════════════
+           Get Current Time (timezone-aware)
+        ══════════════════════════════════════════ */
+        function getNow() {
+            const now = new Date();
+            if (state.timezone === 'local') return now;
+            try {
+                const str = now.toLocaleString('en-US', { timeZone: state.timezone });
+                return new Date(str);
+            } catch {
+                return now;
+            }
+        }
+
+        /* ══════════════════════════════════════════
+           Update Clock
+        ══════════════════════════════════════════ */
+        function updateClock() {
+            const now = getNow();
+            const h = now.getHours();
+            const m = now.getMinutes();
+            const s = now.getSeconds();
+            const ms = now.getMilliseconds();
+
+            const hourDeg = ((h % 12) * 30) + (m * 0.5) + (s * (0.5 / 60));
+            const minDeg = (m * 6) + (s * 0.1);
+            const secDeg = state.smoothSeconds
+                ? (s * 6) + (ms * 0.006)
+                : (s * 6);
+
+            handHour.style.transform = `rotate(${hourDeg}deg)`;
+            handMinute.style.transform = `rotate(${minDeg}deg)`;
+            handSecond.style.transform = `rotate(${secDeg}deg)`;
+
+            // Digital
+            let dh = h, ampm = '';
+            if (!state.use24h) {
+                ampm = h >= 12 ? 'PM' : 'AM';
+                dh = h % 12 || 12;
+            }
+            const hStr = String(dh).padStart(2, '0');
+            const mStr = String(m).padStart(2, '0');
+            const sStr = String(s).padStart(2, '0');
+
+            digitalTime.innerHTML = `${hStr}:${mStr}<span class="seconds">:${sStr}</span>${ampm ? `<span class="ampm">${ampm}</span>` : ''}`;
+
+            // Date
+            if (state.showDate) {
+                digitalDate.style.display = 'block';
+                digitalDate.textContent = now.toLocaleDateString('en-US', {
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                });
+            } else {
+                digitalDate.style.display = 'none';
+            }
+
+            // Timezone label
+            if (state.timezone === 'local') {
+                const tzName = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Local';
+                digitalTimezone.textContent = tzName.replace('_', ' ');
+            } else {
+                digitalTimezone.textContent = state.timezone.replace('_', ' ');
+            }
+
+            // Tick sound
+            if (state.soundOn && !state.smoothSeconds) {
+                playTick();
+            }
+        }
+
+        /* ══════════════════════════════════════════
+           Tick Sound (synthetic)
+        ══════════════════════════════════════════ */
+        let audioCtx = null;
+        function playTick() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.value = 800;
+                osc.type = 'sine';
+                gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+                osc.start(audioCtx.currentTime);
+                osc.stop(audioCtx.currentTime + 0.05);
+            } catch (e) { /* silent fail */ }
+        }
+
+        /* ══════════════════════════════════════════
+           Stopwatch
+        ══════════════════════════════════════════ */
+        function formatSW(ms) {
+            const totalSec = Math.floor(ms / 1000);
+            const m = Math.floor(totalSec / 60);
+            const s = totalSec % 60;
+            const cs = Math.floor((ms % 1000) / 10);
+            return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}<span class="ms">.${String(cs).padStart(2, '0')}</span>`;
+        }
+
+        function updateSWDisplay() {
+            swDisplay.innerHTML = formatSW(state.sw.elapsed);
+        }
+
+        $('swStart').addEventListener('click', () => {
+            if (!state.sw.running) {
+                state.sw.running = true;
+                state.sw.lastTick = performance.now();
+                state.sw.interval = setInterval(() => {
+                    const now = performance.now();
+                    state.sw.elapsed += now - state.sw.lastTick;
+                    state.sw.lastTick = now;
+                    updateSWDisplay();
+                }, 16);
+                $('swStart').innerHTML = '⏸ Pause';
+                $('swStart').classList.remove('btn-primary');
+                $('swStart').classList.add('btn-gold');
+                $('swLap').disabled = false;
+                $('swReset').disabled = false;
+                swBadge.textContent = 'Running';
+                swBadge.className = 'card-badge badge-live';
+            } else {
+                state.sw.running = false;
+                clearInterval(state.sw.interval);
+                $('swStart').innerHTML = '▶ Resume';
+                $('swStart').classList.remove('btn-gold');
+                $('swStart').classList.add('btn-primary');
+                swBadge.textContent = 'Paused';
+                swBadge.className = 'card-badge badge-standby';
+            }
+        });
+
+        $('swLap').addEventListener('click', () => {
+            if (!state.sw.running) return;
+            const prev = state.sw.laps.length > 0 ? state.sw.laps[state.sw.laps.length - 1].total : 0;
+            const diff = state.sw.elapsed - prev;
+            state.sw.laps.push({ total: state.sw.elapsed, diff });
+            renderLaps();
+        });
+
+        $('swReset').addEventListener('click', () => {
+            state.sw.running = false;
+            clearInterval(state.sw.interval);
+            state.sw.elapsed = 0;
+            state.sw.laps = [];
+            updateSWDisplay();
+            $('swStart').innerHTML = '▶ Start';
+            $('swStart').classList.remove('btn-gold');
+            $('swStart').classList.add('btn-primary');
+            $('swLap').disabled = true;
+            $('swReset').disabled = true;
+            swBadge.textContent = 'Standby';
+            swBadge.className = 'card-badge badge-standby';
+            swLaps.innerHTML = '';
+        });
+
+        function renderLaps() {
+            swLaps.innerHTML = state.sw.laps.map((lap, i) => {
+                const totalSec = Math.floor(lap.total / 1000);
+                const m = String(Math.floor(totalSec / 60)).padStart(2, '0');
+                const s = String(totalSec % 60).padStart(2, '0');
+                const cs = String(Math.floor((lap.total % 1000) / 10)).padStart(2, '0');
+
+                const diffSec = Math.floor(lap.diff / 1000);
+                const dm = String(Math.floor(diffSec / 60)).padStart(2, '0');
+                const ds = String(diffSec % 60).padStart(2, '0');
+                const dcs = String(Math.floor((lap.diff % 1000) / 10)).padStart(2, '0');
+
+                return `<div class="lap-item">
+                    <span class="lap-num">LAP ${String(i + 1).padStart(2, '0')}</span>
+                    <span class="lap-diff">+${dm}:${ds}.${dcs}</span>
+                    <span class="lap-time">${m}:${s}.${cs}</span>
+                </div>`;
+            }).reverse().join('');
+        }
+
+        /* ══════════════════════════════════════════
+           Timer
+        ══════════════════════════════════════════ */
+        function getTimerTotal() {
+            return (parseInt($('tmH').value) || 0) * 3600
+                 + (parseInt($('tmM').value) || 0) * 60
+                 + (parseInt($('tmS').value) || 0);
+        }
+
+        function formatTimer(sec) {
+            const h = Math.floor(sec / 3600);
+            const m = Math.floor((sec % 3600) / 60);
+            const s = sec % 60;
+            return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        function updateTimerDisplay() {
+            tmDisplay.textContent = formatTimer(state.tm.remaining);
+            const pct = state.tm.total > 0 ? (state.tm.remaining / state.tm.total) * 100 : 0;
+            tmProgress.style.width = pct + '%';
+
+            tmDisplay.classList.remove('warning', 'danger');
+            if (state.tm.running) {
+                if (state.tm.remaining <= 10) tmDisplay.classList.add('danger');
+                else if (state.tm.remaining <= 30) tmDisplay.classList.add('warning');
+            }
+        }
+
+        // Sync inputs → display
+        [$('tmH'), $('tmM'), $('tmS')].forEach(inp => {
+            inp.addEventListener('input', () => {
+                if (!state.tm.running) {
+                    state.tm.total = getTimerTotal();
+                    state.tm.remaining = state.tm.total;
+                    updateTimerDisplay();
+                }
+            });
+        });
+
+        // Presets
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const mins = parseInt(btn.dataset.m);
+                $('tmH').value = 0;
+                $('tmM').value = mins;
+                $('tmS').value = 0;
+                state.tm.total = mins * 60;
+                state.tm.remaining = state.tm.total;
+                updateTimerDisplay();
+            });
+        });
+
+        $('tmStart').addEventListener('click', () => {
+            if (!state.tm.running) {
+                if (state.tm.remaining <= 0) {
+                    state.tm.total = getTimerTotal();
+                    state.tm.remaining = state.tm.total;
+                }
+                if (state.tm.remaining <= 0) {
+                    showToast('Set a time first', 'warning');
+                    return;
+                }
+                state.tm.running = true;
+                state.tm.interval = setInterval(() => {
+                    state.tm.remaining--;
+                    updateTimerDisplay();
+                    if (state.tm.remaining <= 0) {
+                        clearInterval(state.tm.interval);
+                        state.tm.running = false;
+                        tmBadge.textContent = 'Done!';
+                        tmBadge.className = 'card-badge badge-live';
+                        $('tmStart').innerHTML = '▶ Start';
+                        $('tmStart').classList.remove('btn-gold');
+                        $('tmStart').classList.add('btn-primary');
+                        $('tmReset').disabled = false;
+                        playAlarm();
+                        showToast('⏰ Timer finished!', 'success');
+                    }
+                }, 1000);
+                $('tmStart').innerHTML = '⏸ Pause';
+                $('tmStart').classList.remove('btn-primary');
+                $('tmStart').classList.add('btn-gold');
+                $('tmReset').disabled = false;
+                tmBadge.textContent = 'Running';
+                tmBadge.className = 'card-badge badge-live';
+                // Disable inputs
+                [$('tmH'), $('tmM'), $('tmS')].forEach(i => i.disabled = true);
+            } else {
+                state.tm.running = false;
+                clearInterval(state.tm.interval);
+                $('tmStart').innerHTML = '▶ Resume';
+                $('tmStart').classList.remove('btn-gold');
+                $('tmStart').classList.add('btn-primary');
+                tmBadge.textContent = 'Paused';
+                tmBadge.className = 'card-badge badge-standby';
+            }
+        });
+
+        $('tmReset').addEventListener('click', () => {
+            state.tm.running = false;
+            clearInterval(state.tm.interval);
+            state.tm.total = getTimerTotal();
+            state.tm.remaining = state.tm.total;
+            updateTimerDisplay();
+            $('tmStart').innerHTML = '▶ Start';
+            $('tmStart').classList.remove('btn-gold');
+            $('tmStart').classList.add('btn-primary');
+            $('tmReset').disabled = true;
+            tmBadge.textContent = 'Stopped';
+            tmBadge.className = 'card-badge badge-stopped';
+            tmDisplay.classList.remove('warning', 'danger');
+            [$('tmH'), $('tmM'), $('tmS')].forEach(i => i.disabled = false);
+            document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+        });
+
+        function playAlarm() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, i) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.frequency.value = freq;
+                    osc.type = 'sine';
+                    const t = audioCtx.currentTime + i * 0.2;
+                    gain.gain.setValueAtTime(0.15, t);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+                    osc.start(t);
+                    osc.stop(t + 0.3);
+                });
+            } catch (e) { /* silent fail */ }
+        }
+
+        /* ══════════════════════════════════════════
+           World Clocks
+        ══════════════════════════════════════════ */
+        const worldCities = [
+            { city: 'New York', tz: 'America/New_York', flag: '🇺🇸' },
+            { city: 'London', tz: 'Europe/London', flag: '🇬🇧' },
+            { city: 'Dubai', tz: 'Asia/Dubai', flag: '🇦🇪' },
+            { city: 'Karachi', tz: 'Asia/Karachi', flag: '🇵🇰' },
+            { city: 'Tokyo', tz: 'Asia/Tokyo', flag: '🇯🇵' },
+            { city: 'Sydney', tz: 'Australia/Sydney', flag: '🇦🇺' }
+        ];
+
+        function renderWorldClocks() {
+            const localTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            $('worldClocks').innerHTML = worldCities.map(c => {
+                const now = new Date();
+                const time = now.toLocaleTimeString('en-US', {
+                    timeZone: c.tz, hour: '2-digit', minute: '2-digit', hour12: !state.use24h
+                });
+                const offset = getOffsetDiff(localTZ, c.tz);
+                return `<div class="world-clock-item">
+                    <div>
+                        <div class="wc-city">${c.flag} ${c.city}</div>
+                        <div class="wc-zone">${c.tz.replace('_', ' ')}</div>
+                    </div>
+                    <div>
+                        <div class="wc-time">${time}</div>
+                        <div class="wc-diff">${offset}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function getOffsetDiff(tz1, tz2) {
+            try {
+                const now = new Date();
+                const d1 = new Date(now.toLocaleString('en-US', { timeZone: tz1 }));
+                const d2 = new Date(now.toLocaleString('en-US', { timeZone: tz2 }));
+                const diffMin = Math.round((d2 - d1) / 60000);
+                if (diffMin === 0) return 'Same time';
+                const h = Math.floor(Math.abs(diffMin) / 60);
+                const m = Math.abs(diffMin) % 60;
+                const sign = diffMin > 0 ? '+' : '-';
+                let str = sign + h + 'h';
+                if (m > 0) str += ' ' + m + 'm';
+                return str;
+            } catch {
+                return '';
+            }
+        }
+
+        /* ══════════════════════════════════════════
+           Particles
+        ══════════════════════════════════════════ */
+        function initParticles() {
+            const canvas = $('particlesCanvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            const count = 50;
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 0.3,
+                    vy: (Math.random() - 0.5) * 0.3,
+                    r: Math.random() * 1.5 + 0.5,
+                    o: Math.random() * 0.3 + 0.05
+                });
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if (p.x < 0) p.x = canvas.width;
+                    if (p.x > canvas.width) p.x = 0;
+                    if (p.y < 0) p.y = canvas.height;
+                    if (p.y > canvas.height) p.y = 0;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(56, 189, 248, ${p.o})`;
+                    ctx.fill();
+                });
+
+                // Lines between close particles
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 120) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = `rgba(56, 189, 248, ${0.06 * (1 - dist / 120)})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.stroke();
+                        }
+                    }
+                }
+
+                requestAnimationFrame(draw);
+            }
+            draw();
+        }
+
+        /* ══════════════════════════════════════════
+           Toast
+        ══════════════════════════════════════════ */
+        function showToast(msg, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = msg;
+            toastContainer.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        /* ══════════════════════════════════════════
+           Controls
+        ══════════════════════════════════════════ */
+        // Sound toggle
+        $('btnSound').addEventListener('click', () => {
+            state.soundOn = !state.soundOn;
+            $('btnSound').classList.toggle('active', state.soundOn);
+            $('btnSound').textContent = state.soundOn ? '🔇' : '🔊';
+            if (state.soundOn) {
+                // Initialize audio context on user gesture
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                showToast('Tick sound enabled', 'info');
+            } else {
+                showToast('Tick sound disabled', 'info');
+            }
+        });
+
+        // Smooth seconds toggle
+        $('btnSmooth').addEventListener('click', () => {
+            state.smoothSeconds = !state.smoothSeconds;
+            $('btnSmooth').classList.toggle('active', !state.smoothSeconds);
+            handSecond.classList.toggle('smooth', state.smoothSeconds);
+            handSecond.classList.toggle('tick', !state.smoothSeconds);
+            showToast(state.smoothSeconds ? 'Smooth seconds' : 'Tick seconds', 'info');
+        });
+        $('btnSmooth').classList.add('active'); // smooth is default
+
+        // Fullscreen
+        $('btnFullscreen').addEventListener('click', () => {
+            state.fullscreen = !state.fullscreen;
+            document.body.classList.toggle('fullscreen-mode', state.fullscreen);
+            $('btnFullscreen').classList.toggle('active', state.fullscreen);
+            if (state.fullscreen) {
+                setTimeout(buildClockFace, 50);
+            }
+        });
+
+        // Toggle helpers
+        function setupToggle(id, key, cb) {
+            $(id).addEventListener('click', () => {
+                state[key] = !state[key];
+                $(id).classList.toggle('on', state[key]);
+                if (cb) cb();
+            });
+        }
+
+        setupToggle('tog24h', 'use24h', () => { updateClock(); renderWorldClocks(); });
+        setupToggle('togDate', 'showDate');
+        setupToggle('togNumbers', 'showNumbers', buildClockFace);
+
+        // Timezone
+        $('selTimezone').addEventListener('change', (e) => {
+            state.timezone = e.target.value;
+            updateClock();
+            renderWorldClocks();
+            showToast(`Timezone: ${state.timezone === 'local' ? 'Local' : state.timezone}`, 'info');
+        });
+
+        /* ══════════════════════════════════════════
+           Init
+        ══════════════════════════════════════════ */
+        function init() {
+            buildClockFace();
+            updateClock();
+            updateTimerDisplay();
+            renderWorldClocks();
+            initParticles();
+
+            // High-frequency update for smooth seconds
+            function tick() {
+                updateClock();
+                requestAnimationFrame(tick);
+            }
+            requestAnimationFrame(tick);
+
+            // World clocks every second
+            setInterval(renderWorldClocks, 1000);
+        }
+
+        // Rebuild clock face on resize
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(buildClockFace, 200);
+        });
+
+        init();
+    </script>
+</body>
+
+</html>
