@@ -1,4 +1,3 @@
-```markdown
 <div align="center">
 
 # ⏱ R.A.Y.N Clock
