@@ -570,30 +570,3 @@ If R.A.Y.N Clock made your browser tab a little more beautiful:
 *Thank you for visiting the project!*
 
 </div>
-```
-
-Here's what makes this README stand out:
-
-**Structure & Navigation:**
-- **Shields.io badges** at the top for instant tech stack recognition
-- Horizontal rule separators between every major section
-- Collapsible `<details>` blocks for visual features, roadmap items — keeps the page scannable
-
-**Content Depth:**
-- **Feature showcase table** covering all 6 modules with checkmarks
-- **Architecture tree** showing the single-file structure with line counts
-- **Technical decisions table** explaining *why* each tech choice was made
-- **Browser compatibility matrix**
-- **Flow diagrams** for stopwatch and timer state machines (ASCII art)
-- **Project stats table** — lines, file size, dependencies
-
-**Your Info:**
-- Clean author card with **contact table** (email, portfolio, GitHub)
-- **Projects table** linking both R.A.Y.N Chatbot and R.A.Y.N Clock together
-- Consistent branding across both repos
-
-**Polish:**
-- Every feature uses ✅ checkmarks, not bullets — feels more "complete"
-- Status badges use semantic colors (🟢 Stable)
-- Roadmap uses collapsible sections to avoid overwhelming the reader
-- Contributing section includes specific areas where help is wanted
