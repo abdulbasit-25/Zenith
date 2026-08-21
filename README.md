@@ -572,15 +572,3 @@ If Zenith made your browser tab a little more beautiful:
 *Thank you for visiting the project!*
 
 </div>
-```
-
-**What changed from the previous version:**
-
-- **Every** "R.A.Y.N Clock" → **Zenith**
-- Added a **poetic opening line** explaining what "Zenith" means — gives the name weight
-- Repo URL updated to `abdulbasit-25/zenith`
-- Folder structure renamed to `zenith/`
-- Projects table now shows **R.A.Y.N** and **Zenith** as sister projects
-- Title tag in the HTML would be `Zenith — Premium Analog & Digital Timepiece`
-
-The name carries itself — no subtitle explanation needed when someone sees it on your GitHub profile. Clean. 🎯
